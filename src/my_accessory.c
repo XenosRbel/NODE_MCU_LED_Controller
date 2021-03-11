@@ -57,6 +57,10 @@ homekit_accessory_t *accessories[] = {
     HOMEKIT_ACCESSORY(.id=3, .category=homekit_accessory_category_sensor, .services=(homekit_service_t*[]) {
     	HOMEKIT_SERVICE(ACCESSORY_INFORMATION, .characteristics=(homekit_characteristic_t*[]) {
 			HOMEKIT_CHARACTERISTIC(NAME, "Light Sensor"),
+            HOMEKIT_CHARACTERISTIC(MANUFACTURER, "NodeMCU v3 HomeKit"),
+            HOMEKIT_CHARACTERISTIC(SERIAL_NUMBER, "21022021"),
+            HOMEKIT_CHARACTERISTIC(MODEL, "ESP8266"),
+            HOMEKIT_CHARACTERISTIC(FIRMWARE_REVISION, "1.0"),
 			HOMEKIT_CHARACTERISTIC(IDENTIFY, my_accessory_identify),
 			NULL
 		}),
@@ -70,6 +74,10 @@ homekit_accessory_t *accessories[] = {
     HOMEKIT_ACCESSORY(.id=4, .category=homekit_accessory_category_lightbulb, .services=(homekit_service_t*[]) {
         HOMEKIT_SERVICE(ACCESSORY_INFORMATION, .characteristics=(homekit_characteristic_t*[]) {
             HOMEKIT_CHARACTERISTIC(NAME, "Monitor LED Controller"),
+            HOMEKIT_CHARACTERISTIC(MANUFACTURER, "NodeMCU v3 HomeKit"),
+            HOMEKIT_CHARACTERISTIC(SERIAL_NUMBER, "21022021"),
+            HOMEKIT_CHARACTERISTIC(MODEL, "ESP8266"),
+            HOMEKIT_CHARACTERISTIC(FIRMWARE_REVISION, "1.0"),
             HOMEKIT_CHARACTERISTIC(IDENTIFY, my_accessory_identify),
             NULL
         }),
