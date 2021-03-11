@@ -22,8 +22,7 @@ LightDependentResistor photocell(PIN_PHOTO_SENSOR, OTHER_RESISTOR, USED_PHOTOCEL
 
 // access your HomeKit characteristics defined in my_accessory.c
 extern "C" homekit_server_config_t config;
-extern "C" homekit_characteristic_t cha_switch_left_light;
-extern "C" homekit_characteristic_t cha_switch_right_light;
+
 extern "C" homekit_characteristic_t cha_light;
 
 extern "C" homekit_characteristic_t cha_lightbulb_on;
@@ -37,25 +36,11 @@ static uint32_t next_report_millis = 0;
 #define PIN_SWITCH_RIGHT D2
 #define PIN_LIGHTBULB D3
 
+#define PWMRANGE_MAX_VALUE 1023
+
 int calculate_pwm_bright(int bright_percent)
 {
-	return round((1024 / 100) * bright_percent);
-}
-
-void cha_switch_right_light_setter(const homekit_value_t value)
-{
-	bool on = value.bool_value;
-	cha_switch_right_light.value.bool_value = on;
-	LOG_D("Switch: %s", on ? "ON" : "OFF");
-	digitalWrite(PIN_SWITCH, on ? LOW : HIGH);
-	digitalWrite(PIN_SWITCH_RIGHT, on ? LOW : HIGH);
-}
-
-void cha_switch_left_light_setter(const homekit_value_t value)
-{
-	bool on = value.bool_value;
-	cha_switch_left_light.value.bool_value = on;
-	digitalWrite(PIN_SWITCH_LEFT, on ? LOW : HIGH);
+	return round((PWMRANGE_MAX_VALUE / 100) * bright_percent);
 }
 
 void cha_lightbulb_on_setter(const homekit_value_t value)
@@ -91,9 +76,9 @@ void cha_lightbulb_bright_setter(const homekit_value_t value)
 
 void my_homekit_report()
 {
-	float intensity_in_lux = photocell.getCurrentLux();
+	double intensity_in_lux = photocell.getCurrentLux();
 
-	cha_light.value.float_value = intensity_in_lux;
+	cha_light.value.int_value = round(intensity_in_lux);
 	homekit_characteristic_notify(&cha_light, cha_light.value);
 
 	LOG_D("Current lux: %.5f", intensity_in_lux);
@@ -106,25 +91,10 @@ void my_homekit_setup()
 
 	digitalWrite(PIN_SWITCH, HIGH);
 
-	//Add the .setter function to get the switch-event sent from iOS Home APP.
-	//The .setter should be added before arduino_homekit_setup.
-	//HomeKit sever uses the .setter_ex internally, see homekit_accessories_init function.
-	//Maybe this is a legacy design issue in the original esp-homekit library,
-	//and I have no reason to modify this "feature".
-
-	cha_switch_left_light.setter = cha_switch_left_light_setter;
-	cha_switch_right_light.setter = cha_switch_right_light_setter;
-
 	cha_lightbulb_bright.setter = cha_lightbulb_bright_setter;
 	cha_lightbulb_on.setter = cha_lightbulb_on_setter;
 
 	arduino_homekit_setup(&config);
-
-	//report the switch value to HomeKit if it is changed (e.g. by a physical button)
-	//bool switch_is_on = true/false;
-	//cha_switch_on.value.bool_value = switch_is_on;
-	homekit_characteristic_notify(&cha_switch_left_light, cha_switch_left_light.value);
-	homekit_characteristic_notify(&cha_switch_right_light, cha_switch_right_light.value);
 
 	homekit_characteristic_notify(&cha_lightbulb_bright, cha_lightbulb_bright.value);
 	homekit_characteristic_notify(&cha_lightbulb_on, cha_lightbulb_on.value);
